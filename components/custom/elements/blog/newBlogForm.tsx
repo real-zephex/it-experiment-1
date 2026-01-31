@@ -15,26 +15,41 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  User,
+  ShieldCheck,
+  EyeOff,
+  PenTool,
+  Settings2,
+  Loader2,
+  Clock,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const BlogFormObject = z.object({
   title: z
     .string()
-    .max(100, { error: "Title cannot be longer than 100 characters" })
-    .min(10, { error: "Title needs to be atleast 10 characters long" }),
+    .max(100, { message: "Title cannot be longer than 100 characters" })
+    .min(10, { message: "Title needs to be at least 10 characters long" }),
   description: z
     .string()
     .max(350, {
-      error: "The description cannot be longer than 250 characters",
+      message: "The description cannot be longer than 350 characters",
     })
-    .min(50, { error: "The description needs to be atleast 50 words long" }),
-  content: z.string(),
+    .min(50, {
+      message: "The description needs to be at least 50 characters long",
+    }),
+  content: z.string().min(10, { message: "Content is too short" }),
   author: z.string(),
   hidden: z.boolean(),
   status: z.enum(["halted", "confirmed"]),
@@ -52,7 +67,7 @@ const NewBlogForm = () => {
     userRecord?.data?._id ? { authorId: userRecord.data._id } : "skip",
   );
   const blogRecord = useMutation(api.functions.mutations.addPost);
-  const [count, setCount] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<BlogForm>({
     resolver: zodResolver(BlogFormObject),
@@ -66,11 +81,14 @@ const NewBlogForm = () => {
     },
   });
 
+  const titleValue = form.watch("title");
+  const descriptionValue = form.watch("description");
+
   useEffect(() => {
     if (userRecord?.status && userRecord.data) {
       form.setValue("author", userRecord.data._id);
     }
-  }, [userRecord, form, count]);
+  }, [userRecord, form]);
 
   const handleSubmit = async (values: BlogForm) => {
     if (!userPosts?.canPost) {
@@ -80,156 +98,231 @@ const NewBlogForm = () => {
       return;
     }
 
-    const result = await blogRecord({
-      ...values,
-      author: values.author as Id<"users">,
-    });
-    if (result.status) {
-      toast.success("Blog post created successfully!");
-      form.reset();
-      setCount((prev) => prev + 1);
-    } else {
-      toast.error("There was an error creating the blog post.");
+    setIsSubmitting(true);
+    try {
+      const result = await blogRecord({
+        ...values,
+        author: values.author as Id<"users">,
+      });
+      if (result.status) {
+        toast.success("Blog post created successfully!");
+        form.reset({
+          ...form.getValues(),
+          title: "",
+          description: "",
+          content: "",
+          hidden: false,
+        });
+      } else {
+        toast.error("There was an error creating the blog post.");
+      }
+    } catch (err) {
+      toast.error("An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   if (userRecord === undefined || userPosts === undefined) {
     return (
-      <div className="border p-4 rounded-xl max-w-5xl col-span-full lg:col-span-2">
-        <h2 className="text-xl font-semibold mb-4 border-l-4 border-l-teal-400 pl-2">
-          Create a new post
-        </h2>
-
+      <div className="border p-6 rounded-xl max-w-5xl col-span-full lg:col-span-2 space-y-6">
+        <Skeleton className="h-8 w-48" />
         <div className="space-y-4">
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-40 w-full" />
-          <Skeleton className="h-40 w-full" />
-          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-60 w-full" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="border p-4 rounded-xl max-w-5xl col-span-full lg:col-span-2">
-      <h2 className="text-xl font-semibold mb-4 border-l-4 border-l-teal-400 pl-2">
-        Create a new post
-      </h2>
+    <div className="border p-6 rounded-xl max-w-5xl col-span-full lg:col-span-2 bg-card shadow-sm">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <div className="bg-teal-500/10 p-2 rounded-lg">
+            <PenTool className="h-5 w-5 text-teal-600" />
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight">
+            Create a new post
+          </h2>
+        </div>
+        <div className="flex items-center gap-3 bg-muted/50 px-4 py-2 rounded-full border">
+          <User className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">
+            Posting as{" "}
+            <span className="text-primary">
+              {user?.fullName || "Anonymous"}
+            </span>
+          </span>
+          <Separator orientation="vertical" className="h-4" />
+          <Badge
+            variant={
+              userRecord.data?.status === "confirmed" ? "default" : "secondary"
+            }
+            className="text-[10px] uppercase tracking-wider h-5"
+          >
+            {userRecord.data?.status || "Pending"}
+          </Badge>
+        </div>
+      </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
-          <div className="grid grid-cols-3 gap-4 my-4">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 text-muted-foreground mb-4">
+              <ShieldCheck className="h-4 w-4" />
+              <span className="text-sm font-semibold uppercase tracking-wider">
+                Content Details
+              </span>
+            </div>
+
             <FormField
-              name="author"
+              name="title"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Author</FormLabel>
+                  <div className="flex justify-between items-end">
+                    <FormLabel>Title</FormLabel>
+                    <span
+                      className={`text-[10px] font-mono ${titleValue.length > 100 || (titleValue.length < 10 && titleValue.length > 0) ? "text-destructive" : "text-muted-foreground"}`}
+                    >
+                      {titleValue.length}/100
+                    </span>
+                  </div>
                   <FormControl>
-                    <Input {...field} disabled />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              name="status"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <FormControl>
-                    <Input {...field} disabled />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              name="hidden"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
+                    <Input
+                      type="text"
+                      {...field}
+                      placeholder="e.g. The Future of Web Development in 2026"
+                      className="text-lg font-medium"
                     />
                   </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Keep this post hidden?</FormLabel>
-                    <p className="text-sm text-muted-foreground">
-                      Only admins can see hidden posts.
-                    </p>
+                  <FormDescription>
+                    Catchy titles help your post stand out. (Min 10 chars)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              name="description"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex justify-between items-end">
+                    <FormLabel>Short Description</FormLabel>
+                    <span
+                      className={`text-[10px] font-mono ${descriptionValue.length > 350 || (descriptionValue.length < 50 && descriptionValue.length > 0) ? "text-destructive" : "text-muted-foreground"}`}
+                    >
+                      {descriptionValue.length}/350
+                    </span>
                   </div>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Briefly summarize your post for the feed..."
+                      className="resize-none h-24"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    This appears on the main feed. (Min 50 chars)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              name="content"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Body Content</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Tell your story..."
+                      className="min-h-75 leading-relaxed"
+                    />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
           </div>
 
-          <FormField
-            name="title"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem className="my-2">
-                <FormLabel>Title</FormLabel>
-                <FormControl>
-                  <Input
-                    type="text"
-                    {...field}
-                    required
-                    placeholder="How GenZ might revolutionize the world?"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <Separator />
 
-          <FormField
-            name="description"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem className="my-2">
-                <FormLabel>Short Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    required
-                    placeholder="Briefly describe what this post is about..."
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 text-muted-foreground mb-4">
+              <Settings2 className="h-4 w-4" />
+              <span className="text-sm font-semibold uppercase tracking-wider">
+                Post Settings
+              </span>
+            </div>
 
-          <FormField
-            name="content"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem className="my-2">
-                <FormLabel>Content</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    required
-                    placeholder="Write your blog post content here..."
-                    className="min-h-50"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              name="hidden"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/30">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      <FormLabel className="text-base cursor-pointer">
+                        Private Post
+                      </FormLabel>
+                    </div>
+                    <FormDescription>
+                      Only administrators will be able to view this post.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {!userPosts?.canPost && (
+            <Alert
+              variant="destructive"
+              className="bg-destructive/5 border-destructive/20 text-destructive"
+            >
+              <Clock className="h-4 w-4" />
+              <AlertTitle>Posting Cooldown</AlertTitle>
+              <AlertDescription className="text-xs opacity-90">
+                You recently created a post. To prevent spam, there is a
+                10-minute cooldown between posts.
+              </AlertDescription>
+            </Alert>
+          )}
 
           <Button
             type="submit"
-            className="w-full mt-4"
-            disabled={userRecord?.data?.status === "pending"}
+            size="lg"
+            className="w-full transition-all active:scale-[0.98]"
+            disabled={
+              userRecord?.data?.status === "pending" ||
+              !userPosts?.canPost ||
+              isSubmitting
+            }
           >
-            Create Post
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Publishing...
+              </>
+            ) : (
+              "Publish Post"
+            )}
           </Button>
         </form>
       </Form>

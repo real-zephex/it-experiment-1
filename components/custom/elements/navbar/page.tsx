@@ -1,4 +1,4 @@
-import { GemIcon, LayoutDashboard, Globe, Settings, Bell } from "lucide-react";
+import { GemIcon, LayoutDashboard, ShieldCheck } from "lucide-react";
 import { SignedIn, UserButton } from "@clerk/nextjs";
 import RolePreview from "./helpers/role";
 import UserStatus from "./helpers/status";
@@ -23,10 +23,10 @@ const Navbar = async () => {
               <LayoutDashboard className="h-4 w-4" />
               Dashboard
             </Link>
-            {/* <Link href="#" className="flex items-center gap-2 px-4 py-2 rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
-              <Globe className="h-4 w-4" />
-              Feed
-            </Link> */}
+            <Link href="/security" className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors">
+              <ShieldCheck className="h-4 w-4" />
+              Security
+            </Link>
           </div>
         </div>
 
