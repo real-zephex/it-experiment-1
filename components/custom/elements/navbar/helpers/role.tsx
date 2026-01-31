@@ -13,8 +13,16 @@ const RolePreview = () => {
     user?.id ? { clerkUserId: user.id } : "skip"
   );
 
-  if (!isLoaded || !isSignedIn || !query?.status) {
+  if (!isLoaded || !isSignedIn) {
     return null;
+  }
+
+  if (query === undefined) {
+    return (
+      <Badge variant="outline">
+        loading...
+      </Badge>
+    )
   }
 
   return (

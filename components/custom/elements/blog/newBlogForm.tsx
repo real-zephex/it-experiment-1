@@ -69,7 +69,6 @@ const NewBlogForm = () => {
   }, [userRecord, form, count]);
 
   const handleSubmit = async (values: BlogForm) => {
-
     if (!userPosts?.canPost) {
       toast.error("You can only post once every 10 minutes. Please wait before creating another post.");
       return;
