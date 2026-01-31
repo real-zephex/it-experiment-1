@@ -7,6 +7,7 @@ import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import {
   Form,
   FormControl,
@@ -46,8 +47,11 @@ const NewBlogForm = () => {
   const userRecord = useQuery(api.functions.query.getUserStatus, {
     clerkUserId: user?.id ?? "skip",
   });
-  const userPosts = useQuery(api.functions.query.getLastPostTime, { authorId: userRecord?.data?._id! });
-  const blogRecord = useMutation(api.functions.mutations.addPost)
+  const userPosts = useQuery(
+    api.functions.query.getLastPostTime,
+    userRecord?.data?._id ? { authorId: userRecord.data._id } : "skip",
+  );
+  const blogRecord = useMutation(api.functions.mutations.addPost);
   const [count, setCount] = useState(0);
 
   const form = useForm<BlogForm>({
@@ -70,11 +74,16 @@ const NewBlogForm = () => {
 
   const handleSubmit = async (values: BlogForm) => {
     if (!userPosts?.canPost) {
-      toast.error("You can only post once every 10 minutes. Please wait before creating another post.");
+      toast.error(
+        "You can only post once every 10 minutes. Please wait before creating another post.",
+      );
       return;
     }
 
-    const result = await blogRecord(values);
+    const result = await blogRecord({
+      ...values,
+      author: values.author as Id<"users">,
+    });
     if (result.status) {
       toast.success("Blog post created successfully!");
       form.reset();
@@ -98,8 +107,8 @@ const NewBlogForm = () => {
           <Skeleton className="h-40 w-full" />
           <Skeleton className="h-10 w-full" />
         </div>
-      </div >
-    )
+      </div>
+    );
   }
 
   return (
@@ -149,9 +158,7 @@ const NewBlogForm = () => {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>
-                      Keep this post hidden?
-                    </FormLabel>
+                    <FormLabel>Keep this post hidden?</FormLabel>
                     <p className="text-sm text-muted-foreground">
                       Only admins can see hidden posts.
                     </p>
@@ -159,7 +166,6 @@ const NewBlogForm = () => {
                 </FormItem>
               )}
             />
-
           </div>
 
           <FormField
@@ -218,12 +224,16 @@ const NewBlogForm = () => {
             )}
           />
 
-          <Button type="submit" className="w-full mt-4" disabled={userRecord?.data!.status === "pending"}>
+          <Button
+            type="submit"
+            className="w-full mt-4"
+            disabled={userRecord?.data?.status === "pending"}
+          >
             Create Post
           </Button>
         </form>
       </Form>
-    </div >
+    </div>
   );
 };
 

@@ -33,9 +33,10 @@ const AllPostsUser = () => {
   const userRecord = useQuery(api.functions.query.getUserStatus, {
     clerkUserId: user?.id ?? "skip",
   });
-  const postRecords = useQuery(api.functions.query.getAllPostsOfUser, {
-    authorId: userRecord?.data?._id!,
-  });
+  const postRecords = useQuery(
+    api.functions.query.getAllPostsOfUser,
+    userRecord?.data?._id ? { authorId: userRecord.data._id } : "skip",
+  );
   const deletePost = useMutation(api.functions.mutations.deletePost);
   const togglePostVis = useMutation(
     api.functions.mutations.togglePostVisibility,
@@ -86,7 +87,8 @@ const AllPostsUser = () => {
         <div className="space-y-1">
           <h3 className="font-semibold text-lg">No posts yet</h3>
           <p className="text-sm text-muted-foreground max-w-62.5">
-            You haven't created any blog posts yet. Start sharing your thoughts with the world!
+            You haven&apos;t created any blog posts yet. Start sharing your
+            thoughts with the world!
           </p>
         </div>
       </div>

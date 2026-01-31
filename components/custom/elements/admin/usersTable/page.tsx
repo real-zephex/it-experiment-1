@@ -1,22 +1,21 @@
-"use client"
+"use client";
 
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -32,12 +31,18 @@ import {
   CheckCircle2,
   Clock,
   Trash2,
-  Fingerprint
+  Fingerprint,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const UserTable = () => {
   const users = useQuery(api.functions.query.getAllUsers);
@@ -46,10 +51,11 @@ const UserTable = () => {
   const deleteUser = useMutation(api.functions.mutations.deleteUser);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredUsers = users?.filter(user =>
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.clerk_user_id.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = users?.filter(
+    (user) =>
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.clerk_user_id.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -57,7 +63,9 @@ const UserTable = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
-          <p className="text-muted-foreground">Manage user roles, permissions, and account status.</p>
+          <p className="text-muted-foreground">
+            Manage user roles, permissions, and account status.
+          </p>
         </div>
         <div className="relative w-full md:w-72">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -83,14 +91,26 @@ const UserTable = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50 hover:bg-muted/50 sticky top-0 z-10">
-                  <TableHead className="w-30 font-bold"><div className="flex items-center gap-2"><Fingerprint className="h-4 w-4" /> Clerk ID</div></TableHead>
-                  <TableHead className="font-semibold"><div className="flex items-center gap-2"><Shield className="h-4 w-4" /> Role</div></TableHead>
-                  <TableHead className="font-semibold"><div className="flex items-center gap-2"><Mail className="h-4 w-4" /> Email</div></TableHead>
-                  <TableHead className="font-semibold">
-                    Name
+                  <TableHead className="w-30 font-bold">
+                    <div className="flex items-center gap-2">
+                      <Fingerprint className="h-4 w-4" /> Clerk ID
+                    </div>
                   </TableHead>
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" /> Role
+                    </div>
+                  </TableHead>
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4" /> Email
+                    </div>
+                  </TableHead>
+                  <TableHead className="font-semibold">Name</TableHead>
                   <TableHead className="font-semibold">Status</TableHead>
-                  <TableHead className="text-right font-semibold">Actions</TableHead>
+                  <TableHead className="text-right font-semibold">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -102,24 +122,38 @@ const UserTable = () => {
                   </TableRow>
                 ) : (
                   filteredUsers?.map((user) => (
-                    <TableRow key={user._id} className="group transition-colors hover:bg-muted/50">
+                    <TableRow
+                      key={user._id}
+                      className="group transition-colors hover:bg-muted/50"
+                    >
                       <TableCell className="font-mono text-xs text-muted-foreground">
                         {user.clerk_user_id.slice(0, 12)}...
                       </TableCell>
                       <TableCell>
                         <Badge
-                          variant={user.role === 'admin' ? 'default' : 'outline'}
-                          className={`capitalize gap-1 ${user.role === 'admin' ? 'bg-sky-600 hover:bg-sky-700' : ''}`}
+                          variant={
+                            user.role === "admin" ? "default" : "outline"
+                          }
+                          className={`capitalize gap-1 ${user.role === "admin" ? "bg-sky-600 hover:bg-sky-700" : ""}`}
                         >
-                          {user.role === 'admin' ? <ShieldCheck className="h-3 w-3" /> : <User className="h-3 w-3" />}
+                          {user.role === "admin" ? (
+                            <ShieldCheck className="h-3 w-3" />
+                          ) : (
+                            <User className="h-3 w-3" />
+                          )}
                           {user.role}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-medium">{user.email}</TableCell>
+                      <TableCell className="font-medium">
+                        {user.email}
+                      </TableCell>
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>
-                        {user.status === 'active' ? (
-                          <Badge variant="outline" className="gap-1 border-emerald-500/50 text-emerald-600 bg-emerald-50">
+                        {user.status === "active" ? (
+                          <Badge
+                            variant="outline"
+                            className="gap-1 border-emerald-500/50 text-emerald-600 bg-emerald-50"
+                          >
                             <CheckCircle2 className="h-3 w-3" /> Active
                           </Badge>
                         ) : (
@@ -131,30 +165,62 @@ const UserTable = () => {
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
                               <MoreHorizontal className="h-4 w-4" />
                               <span className="sr-only">Open menu</span>
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-[180px]">
+                          <DropdownMenuContent
+                            align="end"
+                            className="w-45"
+                          >
                             <DropdownMenuItem
                               className="gap-2 cursor-pointer"
-                              onClick={() => updateRole({ id: user._id, role: user.role === 'admin' ? 'user' : 'admin' })}
+                              onClick={() =>
+                                updateRole({
+                                  id: user._id,
+                                  role:
+                                    user.role === "admin" ? "user" : "admin",
+                                })
+                              }
                             >
-                              {user.role === 'admin' ? (
-                                <><UserMinus className="h-4 w-4" /> Demote to User</>
+                              {user.role === "admin" ? (
+                                <>
+                                  <UserMinus className="h-4 w-4" /> Demote to
+                                  User
+                                </>
                               ) : (
-                                <><UserCog className="h-4 w-4" /> Promote to Admin</>
+                                <>
+                                  <UserCog className="h-4 w-4" /> Promote to
+                                  Admin
+                                </>
                               )}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-2 cursor-pointer"
-                              onClick={() => updateStatus({ id: user._id, status: user.status === 'active' ? 'pending' : 'active' })}
+                              onClick={() =>
+                                updateStatus({
+                                  id: user._id,
+                                  status:
+                                    user.status === "active"
+                                      ? "pending"
+                                      : "active",
+                                })
+                              }
                             >
-                              {user.status === 'active' ? (
-                                <><Clock className="h-4 w-4" /> Mark as Pending</>
+                              {user.status === "active" ? (
+                                <>
+                                  <Clock className="h-4 w-4" /> Mark as Pending
+                                </>
                               ) : (
-                                <><CheckCircle2 className="h-4 w-4" /> Confirm User</>
+                                <>
+                                  <CheckCircle2 className="h-4 w-4" /> Confirm
+                                  User
+                                </>
                               )}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -177,7 +243,7 @@ const UserTable = () => {
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};
 
 export default UserTable;
