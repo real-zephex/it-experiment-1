@@ -37,7 +37,7 @@ const UserTable = () => {
         <TableCaption>A list of all the users.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-25">ID</TableHead>
+            <TableHead className="w-25 font-bold">ID</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Status</TableHead>

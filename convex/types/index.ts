@@ -8,3 +8,12 @@ export const UserObject = v.object({
 });
 
 type UserObjectType = Infer<typeof UserObject>;
+
+export const BlogObject = v.object({
+  title: v.string(),
+  description: v.string(),
+  content: v.string(),
+  author: v.string(),
+  hidden: v.boolean(),
+  status: v.string(), // halted, confirmed
+});

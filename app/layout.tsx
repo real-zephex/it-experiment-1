@@ -5,6 +5,7 @@ import { ConvexClientProvider } from "@/lib/ConvexClientProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 import AuthValidation from "@/lib/AuthValidator";
 import Navbar from "@/components/custom/elements/navbar/page";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
         >
           <ConvexClientProvider>
             <AuthValidation>
+              <Toaster position="bottom-right" />
               <Navbar />
               {children}
             </AuthValidation>
