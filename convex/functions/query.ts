@@ -83,7 +83,7 @@ export const getLastPostTime = query({
 });
 
 export const getAllPostsOfUser = query({
-  args: { authorId: v.string() },
+  args: { authorId: v.id("users") },
   handler: async (ctx, args) => {
     try {
       const posts = await ctx.db
@@ -109,6 +109,32 @@ export const GetAllPosts = query({
       return posts;
     } catch (error) {
       console.error(`Error fetching all posts: ${error}`);
+      return [];
+    }
+  },
+});
+
+export const GetAllPostsWithUsers = query({
+  handler: async (ctx) => {
+    try {
+      const blogs = await ctx.db
+        .query("blogs")
+        .withIndex("by_creation_time")
+        .collect();
+      const userIDs = [...new Set(blogs.map((blog) => blog.author))];
+      const users = await Promise.all(
+        userIDs.map(async (id) => await ctx.db.get("users", id)),
+      );
+      const userMap = new Map(
+        users.filter(Boolean).map((user) => [user!._id, user]),
+      );
+
+      return blogs.map((blog) => ({
+        ...blog,
+        user: userMap.get(blog.author) ?? null,
+      }));
+    } catch (error) {
+      console.error(`Error fetching posts with users: ${error}`);
       return [];
     }
   },

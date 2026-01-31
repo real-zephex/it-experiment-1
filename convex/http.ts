@@ -45,7 +45,7 @@ http.route({
 
     if (eventType === "user.created") {
       const user = evt.data;
-      
+
       const clerkUserId = user.id;
       const email = user.email_addresses?.[0]?.email_address ?? null;
 
@@ -66,6 +66,7 @@ http.route({
             email,
             role: "user",
             status: "pending",
+            name: `${user.first_name} ${user.last_name}` || "New User",
           },
         );
 

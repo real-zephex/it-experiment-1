@@ -6,6 +6,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import AuthValidation from "@/lib/AuthValidator";
 import Navbar from "@/components/custom/elements/navbar/page";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/lib/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,17 +30,19 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <ConvexClientProvider>
-            <AuthValidation>
-              <Toaster position="bottom-right" />
-              <Navbar />
-              {children}
-            </AuthValidation>
-          </ConvexClientProvider>
+          <ThemeProvider attribute="class" enableSystem defaultTheme="dark">
+            <ConvexClientProvider>
+              <AuthValidation>
+                <Toaster position="bottom-right" />
+                <Navbar />
+                {children}
+              </AuthValidation>
+            </ConvexClientProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

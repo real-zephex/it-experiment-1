@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 
 const AuthPage = () => {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-sky-50 via-white to-white dark:from-slate-900 dark:via-slate-950 dark:to-black p-4">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-white dark:bg-black p-4">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px]" />
@@ -30,7 +30,7 @@ const AuthPage = () => {
           </div>
         </div>
 
-        <Card className="border-none shadow-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
+        <Card className="border-none shadow-2xl bg-white/80 dark:bg-black/40 backdrop-blur-xl ring-1 ring-black/5 dark:ring-white/10">
           <CardHeader className="space-y-2 text-center">
             <div className="flex justify-center mb-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase">
@@ -41,7 +41,7 @@ const AuthPage = () => {
             <CardTitle className="text-3xl font-extrabold tracking-tight">
               Welcome Back
             </CardTitle>
-            <CardDescription className="text-base">
+            <CardDescription className="text-base text-muted-foreground">
               Please authenticate to access your personal dashboard and global feed.
             </CardDescription>
           </CardHeader>
@@ -66,14 +66,14 @@ const AuthPage = () => {
                   </Button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <Button variant="outline" size="lg" className="w-full">
+                  <Button variant="outline" size="lg" className="w-full bg-transparent hover:bg-black/5 dark:hover:bg-white/5">
                     Create New Account
                   </Button>
                 </SignUpButton>
               </SignedOut>
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-4 border-t bg-muted/30 pt-6 rounded-b-xl">
+          <CardFooter className="flex flex-col gap-4 border-t bg-black/[0.02] dark:bg-white/[0.02] pt-6 rounded-b-xl">
             <div className="flex justify-between items-center w-full text-xs text-muted-foreground font-medium uppercase tracking-widest">
               <span>IT Experiment 1</span>
               <span>v1.0.4</span>

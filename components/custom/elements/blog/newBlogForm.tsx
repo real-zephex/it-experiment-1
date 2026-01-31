@@ -29,7 +29,7 @@ const BlogFormObject = z.object({
     .min(10, { error: "Title needs to be atleast 10 characters long" }),
   description: z
     .string()
-    .max(250, {
+    .max(350, {
       error: "The description cannot be longer than 250 characters",
     })
     .min(50, { error: "The description needs to be atleast 50 words long" }),

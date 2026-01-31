@@ -6,7 +6,7 @@ export default async function Home() {
   return (
     <main className="container mx-auto space-y-12 pb-20 px-4">
       <h1 className="text-3xl font-bold mt-8 border-l-stone-700 border-l-4 pl-4">
-        Dashboard
+        Welcome to IT Experiment - 1
       </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">

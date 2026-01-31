@@ -26,6 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FileText } from "lucide-react";
 
 const AllPostsUser = () => {
   const { user } = useUser();
@@ -71,6 +72,22 @@ const AllPostsUser = () => {
       <div className="p-10">
         <div className="grid grid-cols-1 gap-4">
           <Skeleton className="h-72 w-full rounded-xl" />
+        </div>
+      </div>
+    );
+  }
+
+  if (postRecords?.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 text-center space-y-4 border-2 border-dashed rounded-xl bg-muted/30">
+        <div className="bg-muted p-4 rounded-full">
+          <FileText className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <div className="space-y-1">
+          <h3 className="font-semibold text-lg">No posts yet</h3>
+          <p className="text-sm text-muted-foreground max-w-62.5">
+            You haven't created any blog posts yet. Start sharing your thoughts with the world!
+          </p>
         </div>
       </div>
     );

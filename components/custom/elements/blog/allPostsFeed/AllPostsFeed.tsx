@@ -72,7 +72,7 @@ const AllPostsFeed = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex flex-col md:flex-row gap-4 mb-8 sticky top-0 z-10 bg-background/80 backdrop-blur-md py-4 border-b">
+      <div className="flex flex-col md:flex-row gap-4 mb-8 sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b p-2 rounded-xl">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
