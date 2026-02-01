@@ -44,6 +44,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 const UserTable = () => {
   const users = useQuery(api.functions.query.getAllUsers);
@@ -192,12 +193,17 @@ const UserTable = () => {
                           >
                             <DropdownMenuItem
                               className="gap-2 cursor-pointer"
-                              onClick={() =>
-                                updateRole({
-                                  id: user._id,
-                                  role:
-                                    user.role === "admin" ? "user" : "admin",
-                                })
+                              onClick={() => {
+                                try {
+                                  updateRole({
+                                    id: user._id,
+                                    role:
+                                      user.role === "admin" ? "user" : "admin",
+                                  })
+                                } catch (error) {
+                                  toast.error((error as Error).message);
+                                }
+                              }
                               }
                             >
                               {user.role === "admin" ? (

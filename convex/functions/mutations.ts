@@ -37,6 +37,11 @@ export const updateUserStatus = mutation({
 export const updateUserRole = mutation({
   args: { id: v.id("users"), role: v.string() },
   handler: async (ctx, args) => {
+    const user = await ctx.db.get("users", args.id);
+    if (user?.role === "admin") {
+      throw new Error("Cannot change role of an admin user.");
+    }
+
     await ctx.db.patch("users", args.id, { role: args.role });
   },
 });

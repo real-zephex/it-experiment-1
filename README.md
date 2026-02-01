@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IT Experiment - 1
+
+A web application for creating and managing blog posts with user authentication and role-based access.
+
+## About
+
+This is a blogging platform where users can create, view, and manage their own posts. The application includes an admin panel for managing users and content.
+
+## Features
+
+- User authentication and account management
+- Create and manage blog posts
+- View posts from all users
+- Admin panel for user and content management
+- Responsive design that works on all devices
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies and start the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 in your browser to use the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Required Services
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Before running the application, you need to set up:
 
-## Learn More
+1. Clerk account for authentication
+2. Convex project for the database
 
-To learn more about Next.js, take a look at the following resources:
+Configure these services in your environment variables.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Building for Production
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To create a production build:
 
-## Deploy on Vercel
+```bash
+npm run build
+npm start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- app - Main application pages and layouts
+- components - User interface components
+- convex - Database schema and functions
+- lib - Shared utilities and configurations
+
+## Technology
+
+Built with Next.js, React, TypeScript, and Tailwind CSS. Uses Convex for data storage and Clerk for user authentication.
