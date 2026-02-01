@@ -193,15 +193,16 @@ const UserTable = () => {
                           >
                             <DropdownMenuItem
                               className="gap-2 cursor-pointer"
-                              onClick={() => {
-                                try {
-                                  updateRole({
-                                    id: user._id,
-                                    role:
-                                      user.role === "admin" ? "user" : "admin",
-                                  })
-                                } catch (error) {
-                                  toast.error((error as Error).message);
+                              onClick={async () => {
+                                const status = await updateRole({
+                                  id: user._id,
+                                  role:
+                                    user.role === "admin" ? "user" : "admin",
+                                })
+                                if (status.status) {
+                                  toast.info("User role updated successfully.");
+                                } else {
+                                  toast.error(`Error: ${status.message}`);
                                 }
                               }
                               }

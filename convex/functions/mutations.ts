@@ -34,15 +34,57 @@ export const updateUserStatus = mutation({
   },
 });
 
+type UpdateUserRoleReturnProps = {
+  message: string;
+  status: boolean;
+};
 export const updateUserRole = mutation({
-  args: { id: v.id("users"), role: v.string() },
-  handler: async (ctx, args) => {
-    const user = await ctx.db.get("users", args.id);
-    if (user?.role === "admin") {
-      throw new Error("Cannot change role of an admin user.");
-    }
+  args: {
+    id: v.id("users"),
+    role: v.union(v.literal("user"), v.literal("admin")),
+  },
+  handler: async (ctx, args): Promise<UpdateUserRoleReturnProps> => {
+    try {
+      const identity = await ctx.auth.getUserIdentity();
+      if (!identity) throw new Error("Not authenticated");
 
-    await ctx.db.patch("users", args.id, { role: args.role });
+      const caller = await ctx.db
+        .query("users")
+        .withIndex("by_clerk", (q) => q.eq("clerk_user_id", identity.subject))
+        .first();
+
+      if (!caller) {
+        return {
+          message: "Caller user record not found.",
+          status: false,
+        };
+      }
+
+      if (caller.role !== "admin") {
+        return {
+          message: "Unauthorized: Only admins can update user roles.",
+          status: false,
+        };
+      }
+
+      const user = await ctx.db.get("users", args.id);
+      if (user?.role === "admin") {
+        throw new Error("Cannot change role of an admin user.");
+      }
+
+      await ctx.db.patch("users", args.id, { role: args.role });
+      return {
+        message: "User role updated successfully.",
+        status: true,
+      };
+    } catch (error) {
+      const errorMessage = (error as Error).message;
+      console.error(`Error while updating user role: ${error}`);
+      return {
+        message: errorMessage,
+        status: false,
+      };
+    }
   },
 });
 
