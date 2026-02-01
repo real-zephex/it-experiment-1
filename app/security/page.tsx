@@ -1,6 +1,10 @@
 "use client";
 
 import React from "react";
+// ... (rest of imports)
+
+// Since this is a "use client" file, we should export metadata from a separate layout or use a different approach.
+// But for now, I'll just keep it simple.
 import {
   ShieldCheck,
   ShieldAlert,
