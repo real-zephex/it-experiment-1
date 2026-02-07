@@ -2,6 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
@@ -115,7 +116,7 @@ const AllPostsUser = () => {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-45 w-full rounded-xl" />
+          <Skeleton key={i} className="h-44 w-full rounded-2xl" />
         ))}
       </div>
     );
@@ -123,13 +124,20 @@ const AllPostsUser = () => {
 
   if (postRecords?.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center space-y-4 border-2 border-dashed rounded-xl bg-muted/30">
-        <div className="bg-primary/10 p-4 rounded-full">
-          <FileText className="h-8 w-8 text-primary" />
+      <div
+        className={cn(
+          "flex flex-col items-center justify-center p-8 text-center space-y-4",
+          "border border-dashed rounded-2xl bg-muted/20",
+        )}
+      >
+        <div className="bg-[var(--accent-warm-muted)] p-4 rounded-full border border-border/60">
+          <FileText className="h-7 w-7 text-[color:var(--accent-warm)]" />
         </div>
         <div className="space-y-1">
-          <h3 className="font-bold text-lg tracking-tight">No posts yet</h3>
-          <p className="text-muted-foreground text-xs max-w-50 mx-auto">
+          <h3 className="font-semibold text-lg tracking-tight font-display">
+            No posts yet
+          </h3>
+          <p className="text-muted-foreground text-xs max-w-52 mx-auto">
             Share your first story with the community!
           </p>
         </div>
@@ -152,12 +160,21 @@ const AllPostsUser = () => {
           placeholder="Filter your posts..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 bg-background focus-visible:ring-primary"
+          className={cn(
+            "pl-10 rounded-full text-sm",
+            "bg-background/70 border-border/70",
+            "focus-visible:ring-primary/40",
+          )}
         />
       </div>
 
       {filteredPosts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-xl bg-card/50">
+        <div
+          className={cn(
+            "flex flex-col items-center justify-center py-12 text-center",
+            "border border-dashed rounded-2xl bg-card/50",
+          )}
+        >
           <Search className="h-6 w-6 text-muted-foreground mb-2" />
           <p className="text-sm font-bold">No matches</p>
           <Button
@@ -174,34 +191,49 @@ const AllPostsUser = () => {
           {filteredPosts.map((post) => (
             <Card
               key={post._id}
-              className="group flex flex-col hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-md bg-card overflow-hidden"
+              className={cn(
+                "group flex flex-col rounded-2xl border-border/60",
+                "hover:border-primary/40 transition-all duration-300",
+                "shadow-sm hover:shadow-md bg-card/80 overflow-hidden",
+              )}
             >
               <CardHeader className="p-4 pb-2">
-                <div className="flex justify-between items-start mb-1">
+                <div className="flex justify-between items-start mb-2 text-xs text-muted-foreground">
                   <Badge
                     variant={post.hidden ? "outline" : "default"}
-                    className={
+                    className={cn(
+                      "text-[9px] h-4 px-2 uppercase tracking-[0.2em]",
                       post.hidden
-                        ? "text-[9px] h-4 px-1.5 bg-amber-500/10 text-amber-600 border-amber-200/50"
-                        : "text-[9px] h-4 px-1.5 bg-emerald-500/10 text-emerald-600 border-emerald-200/50"
-                    }
+                        ? "bg-amber-500/10 text-amber-600 border-amber-200/50"
+                        : "bg-emerald-500/10 text-emerald-600 border-emerald-200/50",
+                    )}
                   >
                     {post.hidden ? "Hidden" : "Public"}
                   </Badge>
-                  <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                  <span className="text-[10px] flex items-center gap-1 uppercase tracking-[0.2em]">
                     <Clock className="h-2.5 w-2.5" />
                     {formatDistanceToNow(new Date(post._creationTime), {
                       addSuffix: true,
                     })}
                   </span>
                 </div>
-                <CardTitle className="text-base font-bold line-clamp-1 group-hover:text-primary transition-colors">
+                <CardTitle
+                  className={cn(
+                    "text-base font-semibold line-clamp-1 font-display",
+                    "group-hover:text-primary transition-colors",
+                  )}
+                >
                   {post.title}
                 </CardTitle>
               </CardHeader>
 
               <CardContent className="p-4 pt-0">
-                <CardDescription className="line-clamp-2 text-xs mb-4">
+                <CardDescription
+                  className={cn(
+                    "line-clamp-2 text-xs mb-4",
+                    "text-muted-foreground/90",
+                  )}
+                >
                   {post.description}
                 </CardDescription>
 
@@ -211,7 +243,7 @@ const AllPostsUser = () => {
                       <Button
                         size="sm"
                         variant="secondary"
-                        className="flex-1 h-8 text-xs font-semibold"
+                        className="flex-1 h-8 text-xs font-semibold rounded-full"
                       >
                         View
                         <ChevronRight className="ml-1 h-3 w-3" />
@@ -219,7 +251,12 @@ const AllPostsUser = () => {
                     </DrawerTrigger>
                     <DrawerContent className="max-h-[95vh]">
                       <div className="mx-auto w-full max-w-4xl overflow-y-auto scrollbar-hide">
-                        <DrawerHeader className="text-left border-b bg-muted/10 pb-8 sticky top-0 backdrop-blur-md z-10">
+                        <DrawerHeader
+                          className={cn(
+                            "text-left border-b bg-background/90 pb-8",
+                            "sticky top-0 backdrop-blur-md z-10",
+                          )}
+                        >
                           <div className="flex flex-wrap items-center gap-3 mb-4">
                             <Badge
                               variant={post.hidden ? "outline" : "default"}
@@ -233,7 +270,12 @@ const AllPostsUser = () => {
                             >
                               {post.status}
                             </Badge>
-                            <span className="text-sm text-muted-foreground flex items-center gap-2 ml-auto bg-muted px-3 py-1 rounded-full">
+                            <span
+                              className={cn(
+                                "text-xs text-muted-foreground flex items-center gap-2 ml-auto",
+                                "bg-muted/60 px-3 py-1 rounded-full",
+                              )}
+                            >
                               <Calendar className="h-3.5 w-3.5" />
                               {new Date(post._creationTime).toLocaleDateString(
                                 undefined,
@@ -241,28 +283,50 @@ const AllPostsUser = () => {
                               )}
                             </span>
                           </div>
-                          <DrawerTitle className="text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.1]">
+                          <DrawerTitle
+                            className={cn(
+                              "text-4xl md:text-5xl font-extrabold tracking-tight",
+                              "leading-[1.1] font-display",
+                            )}
+                          >
                             {post.title}
                           </DrawerTitle>
-                          <DrawerDescription className="text-xl mt-6 text-foreground/70 font-medium leading-relaxed max-w-3xl border-l-4 border-primary/20 pl-6">
+                          <DrawerDescription
+                            className={cn(
+                              "text-lg md:text-xl mt-6 text-foreground/70 font-medium",
+                              "leading-relaxed max-w-3xl border-l-4 border-primary/20 pl-6",
+                            )}
+                          >
                             {post.description}
                           </DrawerDescription>
                         </DrawerHeader>
 
                         <div className="p-8 md:p-12 pb-20">
                           <article className="max-w-none">
-                            <div className="whitespace-pre-wrap leading-[1.8] text-lg md:text-xl text-foreground/90 font-serif">
+                            <div
+                              className={cn(
+                                "whitespace-pre-wrap leading-[1.8]",
+                                "text-base md:text-lg text-foreground/90 font-serif",
+                              )}
+                            >
                               {post.content}
                             </div>
                           </article>
                         </div>
 
-                        <DrawerFooter className="border-t bg-card/80 backdrop-blur-sm pt-8 sticky bottom-0 z-10">
+                        <DrawerFooter
+                          className={cn(
+                            "border-t bg-card/90 backdrop-blur-sm pt-8",
+                            "sticky bottom-0 z-10",
+                          )}
+                        >
                           <div className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto w-full">
                             <Button
                               variant="outline"
                               size="lg"
-                              className="flex-1 font-bold h-12 shadow-sm"
+                              className={cn(
+                                "flex-1 font-semibold h-12 shadow-sm rounded-full",
+                              )}
                               disabled={togglingId === post._id}
                               onClick={() =>
                                 handleToggleVisibility(post._id, !post.hidden)
@@ -286,11 +350,11 @@ const AllPostsUser = () => {
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button
-                                  variant="destructive"
-                                  size="lg"
-                                  className="flex-1 font-bold h-12 shadow-sm"
-                                  disabled={deletingId === post._id}
-                                >
+                              variant="destructive"
+                              size="lg"
+                              className="flex-1 font-semibold h-12 shadow-sm rounded-full"
+                              disabled={deletingId === post._id}
+                            >
                                   {deletingId === post._id ? (
                                     <Loader2 className="h-5 w-5 animate-spin" />
                                   ) : (
@@ -308,7 +372,12 @@ const AllPostsUser = () => {
                                   </AlertDialogTitle>
                                   <AlertDialogDescription className="text-base mt-2">
                                     This action is irreversible. The post{" "}
-                                    <span className="font-bold text-foreground underline decoration-destructive/30 decoration-2">
+                                    <span
+                                      className={cn(
+                                        "font-bold text-foreground underline",
+                                        "decoration-destructive/30 decoration-2",
+                                      )}
+                                    >
                                       &quot;{post.title}&quot;
                                     </span>{" "}
                                     and all its metadata will be purged from our
@@ -321,7 +390,10 @@ const AllPostsUser = () => {
                                   </AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() => handleDelete(post._id)}
-                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-bold px-6 rounded-xl"
+                                    className={cn(
+                                      "bg-destructive text-destructive-foreground",
+                                      "hover:bg-destructive/90 font-bold px-6 rounded-xl",
+                                    )}
                                   >
                                     Yes, Delete it
                                   </AlertDialogAction>
@@ -338,7 +410,10 @@ const AllPostsUser = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/5"
+                      className={cn(
+                        "h-8 w-8 rounded-full text-muted-foreground",
+                        "hover:text-primary hover:bg-primary/5",
+                      )}
                       disabled={togglingId === post._id}
                       onClick={() =>
                         handleToggleVisibility(post._id, !post.hidden)
@@ -358,7 +433,10 @@ const AllPostsUser = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/5"
+                          className={cn(
+                            "h-8 w-8 rounded-full text-muted-foreground",
+                            "hover:text-destructive hover:bg-destructive/5",
+                          )}
                           disabled={deletingId === post._id}
                         >
                           {deletingId === post._id ? (

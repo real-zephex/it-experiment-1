@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "convex/react";
@@ -83,6 +84,15 @@ const NewBlogForm = () => {
 
   const titleValue = form.watch("title");
   const descriptionValue = form.watch("description");
+  const titleCountClass =
+    titleValue.length > 100 || (titleValue.length < 10 && titleValue.length > 0)
+      ? "text-destructive"
+      : "text-muted-foreground";
+  const descriptionCountClass =
+    descriptionValue.length > 350 ||
+    (descriptionValue.length < 50 && descriptionValue.length > 0)
+      ? "text-destructive"
+      : "text-muted-foreground";
 
   useEffect(() => {
     if (userRecord?.status && userRecord.data) {
@@ -128,8 +138,8 @@ const NewBlogForm = () => {
 
   if (userRecord === undefined || userPosts === undefined) {
     return (
-      <div className="border p-6 rounded-xl max-w-5xl col-span-full lg:col-span-2 space-y-6">
-        <Skeleton className="h-8 w-48" />
+      <div className="rounded-2xl border bg-background/60 p-6 md:p-8 shadow-sm space-y-6">
+        <Skeleton className="h-8 w-56" />
         <div className="space-y-4">
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-10 w-full" />
@@ -141,19 +151,24 @@ const NewBlogForm = () => {
   }
 
   return (
-    <div className="border p-6 rounded-xl max-w-5xl col-span-full lg:col-span-2 bg-card shadow-sm">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <div className="bg-teal-500/10 p-2 rounded-lg">
-            <PenTool className="h-5 w-5 text-teal-600" />
+    <div className="rounded-2xl border bg-background/60 p-6 md:p-8 shadow-sm">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-3">
+          <div className="bg-(--accent-warm-muted) p-2 rounded-xl border border-border/60">
+            <PenTool className="h-5 w-5 text-(--accent-warm)" />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight">
-            Create a new post
-          </h2>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+              New post
+            </p>
+            <h2 className="text-2xl md:text-3xl font-display tracking-tight">
+              Create a new post
+            </h2>
+          </div>
         </div>
-        <div className="flex items-center gap-3 bg-muted/50 px-4 py-2 rounded-full border">
+        <div className="flex items-center gap-3 bg-muted/40 px-4 py-2 rounded-full border border-border/60 text-xs">
           <User className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium">
+          <span className="font-medium">
             Posting as{" "}
             <span className="text-primary">
               {user?.fullName || "Anonymous"}
@@ -176,7 +191,7 @@ const NewBlogForm = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-2 text-muted-foreground mb-4">
               <ShieldCheck className="h-4 w-4" />
-              <span className="text-sm font-semibold uppercase tracking-wider">
+              <span className="text-xs font-semibold uppercase tracking-[0.3em]">
                 Content Details
               </span>
             </div>
@@ -187,9 +202,9 @@ const NewBlogForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex justify-between items-end">
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel className="text-sm font-semibold">Title</FormLabel>
                     <span
-                      className={`text-[10px] font-mono ${titleValue.length > 100 || (titleValue.length < 10 && titleValue.length > 0) ? "text-destructive" : "text-muted-foreground"}`}
+                      className={cn("text-[10px] font-mono", titleCountClass)}
                     >
                       {titleValue.length}/100
                     </span>
@@ -199,10 +214,14 @@ const NewBlogForm = () => {
                       type="text"
                       {...field}
                       placeholder="e.g. The Future of Web Development in 2026"
-                      className="text-lg font-medium"
+                      className={cn(
+                        "text-base md:text-lg font-medium",
+                        "bg-background/70 border-border/70",
+                        "focus-visible:ring-primary/40",
+                      )}
                     />
                   </FormControl>
-                  <FormDescription>
+                  <FormDescription className="text-xs text-muted-foreground">
                     Catchy titles help your post stand out. (Min 10 chars)
                   </FormDescription>
                   <FormMessage />
@@ -216,9 +235,14 @@ const NewBlogForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex justify-between items-end">
-                    <FormLabel>Short Description</FormLabel>
+                    <FormLabel className="text-sm font-semibold">
+                      Short Description
+                    </FormLabel>
                     <span
-                      className={`text-[10px] font-mono ${descriptionValue.length > 350 || (descriptionValue.length < 50 && descriptionValue.length > 0) ? "text-destructive" : "text-muted-foreground"}`}
+                      className={cn(
+                        "text-[10px] font-mono",
+                        descriptionCountClass,
+                      )}
                     >
                       {descriptionValue.length}/350
                     </span>
@@ -227,10 +251,13 @@ const NewBlogForm = () => {
                     <Textarea
                       {...field}
                       placeholder="Briefly summarize your post for the feed..."
-                      className="resize-none h-24"
+                      className={cn(
+                        "resize-none h-24",
+                        "bg-background/70 border-border/70",
+                      )}
                     />
                   </FormControl>
-                  <FormDescription>
+                  <FormDescription className="text-xs text-muted-foreground">
                     This appears on the main feed. (Min 50 chars)
                   </FormDescription>
                   <FormMessage />
@@ -243,12 +270,17 @@ const NewBlogForm = () => {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Body Content</FormLabel>
+                  <FormLabel className="text-sm font-semibold">
+                    Body Content
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
                       placeholder="Tell your story..."
-                      className="min-h-75 leading-relaxed"
+                      className={cn(
+                        "min-h-70 text-base md:text-lg leading-relaxed",
+                        "bg-background/70 border-border/70",
+                      )}
                     />
                   </FormControl>
                   <FormMessage />
@@ -262,42 +294,44 @@ const NewBlogForm = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-2 text-muted-foreground mb-4">
               <Settings2 className="h-4 w-4" />
-              <span className="text-sm font-semibold uppercase tracking-wider">
+              <span className="text-xs font-semibold uppercase tracking-[0.3em]">
                 Post Settings
               </span>
             </div>
 
-            <FormField
-              name="hidden"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/30">
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                      <FormLabel className="text-base cursor-pointer">
-                        Private Post
-                      </FormLabel>
+            <div className="rounded-2xl border bg-muted/40 p-5">
+              <FormField
+                name="hidden"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        <FormLabel className="text-sm font-semibold cursor-pointer">
+                          Private Post
+                        </FormLabel>
+                      </div>
+                      <FormDescription className="text-xs text-muted-foreground">
+                        Only administrators will be able to view this post.
+                      </FormDescription>
                     </div>
-                    <FormDescription>
-                      Only administrators will be able to view this post.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
 
           {!userPosts?.canPost && (
             <Alert
               variant="destructive"
-              className="bg-destructive/5 border-destructive/20 text-destructive"
+              className="bg-destructive/5 border-destructive/20 text-destructive rounded-2xl"
             >
               <Clock className="h-4 w-4" />
               <AlertTitle>Posting Cooldown</AlertTitle>
@@ -311,7 +345,7 @@ const NewBlogForm = () => {
           <Button
             type="submit"
             size="lg"
-            className="w-full transition-all active:scale-[0.98]"
+            className="w-full transition-all active:scale-[0.98] font-semibold tracking-wide"
             disabled={
               userRecord?.data?.status === "pending" ||
               !userPosts?.canPost ||
