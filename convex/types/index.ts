@@ -1,14 +1,12 @@
-import { v, Infer } from "convex/values";
+import { v } from "convex/values";
 
 export const UserObject = v.object({
   clerk_user_id: v.string(),
-  role: v.string(),
+  role: v.union(v.literal("user"), v.literal("admin")),
   email: v.string(),
-  status: v.string(),
+  status: v.union(v.literal("active"), v.literal("pending")),
   name: v.string(),
 });
-
-type UserObjectType = Infer<typeof UserObject>;
 
 export const BlogObject = v.object({
   title: v.string(),
@@ -16,5 +14,5 @@ export const BlogObject = v.object({
   content: v.string(),
   author: v.id("users"),
   hidden: v.boolean(),
-  status: v.string(), // halted, confirmed
+  status: v.union(v.literal("halted"), v.literal("public")),
 });

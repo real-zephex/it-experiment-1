@@ -1,40 +1,40 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useUser } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useUser } from "@clerk/nextjs";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "convex/react";
 import {
-  User,
-  ShieldCheck,
+  Clock,
   EyeOff,
+  Loader2,
   PenTool,
   Settings2,
-  Loader2,
-  Clock,
+  ShieldCheck,
+  User,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 const BlogFormObject = z.object({
   title: z
@@ -52,7 +52,7 @@ const BlogFormObject = z.object({
   content: z.string().min(10, { message: "Content is too short" }),
   author: z.string(),
   hidden: z.boolean(),
-  status: z.enum(["halted", "confirmed"]),
+  status: z.enum(["halted", "public"]),
 });
 
 type BlogForm = z.infer<typeof BlogFormObject>;
@@ -116,7 +116,10 @@ const NewBlogForm = () => {
       } else {
         toast.error("There was an error creating the blog post.");
       }
-    } catch (err) {
+    } catch (error) {
+      console.error(
+        `Error occured while creating the post: ${(error as Error).message}`,
+      );
       toast.error("An unexpected error occurred.");
     } finally {
       setIsSubmitting(false);
@@ -159,7 +162,7 @@ const NewBlogForm = () => {
           <Separator orientation="vertical" className="h-4" />
           <Badge
             variant={
-              userRecord.data?.status === "confirmed" ? "default" : "secondary"
+              userRecord.data?.status === "active" ? "default" : "secondary"
             }
             className="text-[10px] uppercase tracking-wider h-5"
           >

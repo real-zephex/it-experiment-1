@@ -2,6 +2,7 @@ import { GemIcon, LayoutDashboard, ShieldCheck } from "lucide-react";
 import { SignedIn, UserButton } from "@clerk/nextjs";
 import RolePreview from "./helpers/role";
 import UserStatus from "./helpers/status";
+import AdminLink from "./helpers/adminLink";
 import Link from "next/link";
 
 const Navbar = async () => {
@@ -27,6 +28,7 @@ const Navbar = async () => {
               <ShieldCheck className="h-4 w-4" />
               Security
             </Link>
+            <AdminLink />
           </div>
         </div>
 

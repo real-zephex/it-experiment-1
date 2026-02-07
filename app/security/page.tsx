@@ -8,14 +8,11 @@ import React from "react";
 import {
   ShieldCheck,
   ShieldAlert,
-  Layers,
   Lock,
-  GlobeLock,
-  LogIn,
+
   TextCursorInput,
   EyeOff,
   UserCheck,
-  Key,
   Shield,
   Zap,
   Timer,
@@ -32,8 +29,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";

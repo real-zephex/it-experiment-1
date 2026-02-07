@@ -1,8 +1,4 @@
-import {
-  SignInButton,
-  SignUpButton,
-  SignedOut,
-} from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,8 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ShieldCheck, ArrowRight, GemIcon, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  SignInButton,
+  SignUpButton,
+  SignedOut,
+} from "@clerk/nextjs";
+import { ArrowRight, CheckCircle2, GemIcon, ShieldCheck } from "lucide-react";
 
 const AuthPage = () => {
   return (

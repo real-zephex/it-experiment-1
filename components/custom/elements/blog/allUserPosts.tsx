@@ -1,28 +1,12 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
-import { useState, useMemo } from "react";
-import { Id } from "@/convex/_generated/dataModel";
 import { formatDistanceToNow } from "date-fns";
+import { useMemo, useState } from "react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,21 +18,37 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
-  FileText,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Calendar,
+  ChevronRight,
+  Clock,
   Eye,
   EyeOff,
-  Trash2,
-  Search,
-  Calendar,
-  Clock,
-  ChevronRight,
+  FileText,
   Loader2,
   Plus,
+  Search,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -87,6 +87,9 @@ const AllPostsUser = () => {
       await togglePostVis({ id, hidden });
       toast.success(hidden ? "Post is now hidden" : "Post is now public");
     } catch (error) {
+      console.error(
+        `Error occured while toggling post visibility: ${(error as Error).message}`,
+      );
       toast.error("Failed to update visibility");
     } finally {
       setTogglingId(null);
@@ -99,6 +102,9 @@ const AllPostsUser = () => {
       await deletePost({ id });
       toast.success("Post deleted successfully");
     } catch (error) {
+      console.error(
+        `Error occured while deleting post: ${(error as Error).message}`,
+      );
       toast.error("Failed to delete post");
     } finally {
       setDeletingId(null);

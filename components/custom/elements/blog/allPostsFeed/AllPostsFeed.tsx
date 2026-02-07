@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,6 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -18,24 +24,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { api } from "@/convex/_generated/api";
+import { useQuery } from "convex/react";
 import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Search,
-  Clock,
   ArrowUpDown,
   BookOpen,
-  User,
+  Clock,
+  Search,
   Share2,
+  User,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useMemo, useState } from "react";
 
 const AllPostsFeed = () => {
   const posts = useQuery(api.functions.query.GetAllPostsWithUsers);
@@ -215,9 +215,9 @@ const AllPostsFeed = () => {
                     </CardFooter>
                   </Card>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl scroll-smooth max-h-[92vh] overflow-y-auto p-0 gap-0 border-none shadow-2xl">
+                <DialogContent className="scroll-smooth overflow-y-auto p-0 gap-0 border-none shadow-2xl">
                   <DialogTitle className="sr-only">{post.title}</DialogTitle>
-                  <div className="relative h-48 w-full bg-linear-to-br from-primary/20 via-primary/5 to-background border-b">
+                  <div className="relative h-60 w-full bg-linear-to-br from-primary/20 via-primary/5 to-background border-b">
                     <div className="absolute inset-0 bg-grid-white/10 mask-[linear-gradient(0deg,#fff,rgba(255,255,255,0.6))]" />
                     <div className="absolute bottom-0 left-0 right-0 p-8 space-y-4 bg-linear-to-t from-background to-transparent">
                       <div className="flex flex-wrap gap-2">
@@ -242,8 +242,8 @@ const AllPostsFeed = () => {
                     </div>
                   </div>
 
-                  <div className="px-8 pb-12">
-                    <header className="py-8 border-b border-muted/30 mb-8 sticky z-10 top-0 bg-background/90 backdrop-blur-md">
+                   <div className="px-8 pb-12">
+                     <header className="py-8 border-b border-muted/30 mb-8 sticky z-10 top-0 bg-background/90 backdrop-blur-md">
                       <h1 className="text-4xl md:text-5xl font-black leading-tight tracking-tight mb-6">
                         {post.title}
                       </h1>

@@ -1,13 +1,5 @@
 "use client";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,26 +8,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import {
-  MoreHorizontal,
-  Search,
-  User,
-  Mail,
-  Shield,
-  ShieldCheck,
-  UserCog,
-  UserMinus,
-  CheckCircle2,
-  Clock,
-  Trash2,
-  Fingerprint,
-} from "lucide-react";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -43,7 +25,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { api } from "@/convex/_generated/api";
+import { useMutation, useQuery } from "convex/react";
+import {
+  CheckCircle2,
+  Clock,
+  Fingerprint,
+  Mail,
+  MoreHorizontal,
+  Search,
+  Shield,
+  ShieldCheck,
+  Trash2,
+  User,
+  UserCog,
+  UserMinus,
+} from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 const UserTable = () => {
