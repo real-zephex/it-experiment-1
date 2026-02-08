@@ -1,6 +1,8 @@
-import ManageBlogs from "@/components/custom/elements/admin/blogsTable/page";
-import UserTable from "@/components/custom/elements/admin/usersTable/page";
 import { Metadata } from "next";
+
+import ManageBlogs from "@/components/custom/elements/admin/blogsTable/page";
+import LogsTable from "@/components/custom/elements/admin/logsTable/page";
+import UserTable from "@/components/custom/elements/admin/usersTable/page";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",
@@ -13,6 +15,7 @@ export default function AdminPage() {
       <div className="flex flex-col gap-4">
         <UserTable />
         <ManageBlogs />
+        <LogsTable />
       </div>
     </div>
   );

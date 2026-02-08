@@ -28,6 +28,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { api } from "@/convex/_generated/api";
+import { logAction } from "@/lib/db/functions/write";
+import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import {
   Calendar,
@@ -43,8 +45,14 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const ManageBlogs = () => {
+  const { user } = useUser();
+
+  const { id, fullName } = user!;
+  const email = user?.emailAddresses[0]?.emailAddress || "unknown_email";
+
   const blogs = useQuery(api.functions.query.GetAllPostsWithUsers);
   const deleteBlog = useMutation(api.functions.mutations.deletePost);
   const updateBlogStatus = useMutation(
@@ -224,7 +232,7 @@ const ManageBlogs = () => {
                         <DropdownMenuContent align="end" className="w-40">
                           <DropdownMenuItem
                             className="gap-2 cursor-pointer"
-                            onClick={() =>
+                            onClick={async () => {
                               updateBlogStatus({
                                 id: blog._id,
                                 status:
@@ -232,7 +240,22 @@ const ManageBlogs = () => {
                                     ? "halted"
                                     : "public",
                               })
-                            }
+                              const res = await logAction({
+                                clerk_user_id: id,
+                                email: email,
+                                name: fullName!,
+                                transaction_type:
+                                  blog.status === "public"
+                                    ? "halt_blog"
+                                    : "make_public_blog",
+                                affected_table: "blogs",
+                                affected_user_id: blog._id,
+                              });
+
+                              if (!res.status) {
+                                toast.info("Blog status updated, but failed to log the action.");
+                              }
+                            }}
                           >
                             {blog.status === "public" ? (
                               <>
@@ -248,7 +271,21 @@ const ManageBlogs = () => {
                           <DropdownMenuItem
                             variant="destructive"
                             className="gap-2 cursor-pointer"
-                            onClick={() => deleteBlog({ id: blog._id })}
+                            onClick={async () => {
+                              deleteBlog({ id: blog._id })
+                              const res = await logAction({
+                                clerk_user_id: id,
+                                email: email,
+                                name: fullName!,
+                                transaction_type: "delete_blog",
+                                affected_table: "blogs",
+                                affected_user_id: blog._id,
+                              });
+
+                              if (!res.status) {
+                                toast.info("Blog deleted, but failed to log the action.");
+                              }
+                            }}
                           >
                             <Trash2 className="h-4 w-4" /> Delete Blog
                           </DropdownMenuItem>

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   AlertDialog,
@@ -52,9 +52,12 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { logAction } from "@/lib/db/functions/write";
 
 const AllPostsUser = () => {
   const { user } = useUser();
+  const isMountedRef = useRef<boolean>(false)
+
   const [searchQuery, setSearchQuery] = useState("");
   const [deletingId, setDeletingId] = useState<Id<"blogs"> | null>(null);
   const [togglingId, setTogglingId] = useState<Id<"blogs"> | null>(null);
@@ -73,6 +76,23 @@ const AllPostsUser = () => {
     api.functions.mutations.togglePostVisibility,
   );
 
+  const [_id, setId] = useState<string>("");
+  const [fullName, setFullName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    if (isMountedRef.current && user) {
+      setId(user.id);
+      setFullName(user.fullName || "");
+      setEmail(user.emailAddresses[0].emailAddress);
+    }
+
+    return () => {
+      isMountedRef.current = false;
+    }
+  }, [user]);
+
   const filteredPosts = useMemo(() => {
     if (!postRecords) return [];
     return postRecords.filter(
@@ -87,11 +107,34 @@ const AllPostsUser = () => {
     try {
       await togglePostVis({ id, hidden });
       toast.success(hidden ? "Post is now hidden" : "Post is now public");
+
+      const res = await logAction({
+        clerk_user_id: _id,
+        email: email,
+        name: fullName,
+        transaction_type: hidden ? "hide_post" : "restore_post",
+        affected_table: "blogs",
+        affected_user_id: id.toString(),
+      });
+      if (!res.status) {
+        toast.info("Post visibility updated, but failed to log the action");
+      }
     } catch (error) {
       console.error(
         `Error occured while toggling post visibility: ${(error as Error).message}`,
       );
       toast.error("Failed to update visibility");
+      const res = await logAction({
+        clerk_user_id: _id,
+        email: email,
+        name: fullName,
+        transaction_type: "toggle_visibility_failed",
+        affected_table: "blogs",
+        affected_user_id: id.toString(),
+      });
+      if (!res.status) {
+        toast.info("Failed to log the failed toggle action");
+      }
     } finally {
       setTogglingId(null);
     }
@@ -102,10 +145,32 @@ const AllPostsUser = () => {
     try {
       await deletePost({ id });
       toast.success("Post deleted successfully");
+      const res = await logAction({
+        clerk_user_id: _id,
+        email: email,
+        name: fullName,
+        transaction_type: "delete_post",
+        affected_table: "blogs",
+        affected_user_id: id.toString(),
+      });
+      if (!res.status) {
+        toast.info("Post deleted, but failed to log the action");
+      }
     } catch (error) {
       console.error(
         `Error occured while deleting post: ${(error as Error).message}`,
       );
+      const res = await logAction({
+        clerk_user_id: _id,
+        email: email,
+        name: fullName!,
+        transaction_type: "delete_post_failed",
+        affected_table: "blogs",
+        affected_user_id: id.toString(),
+      });
+      if (!res.status) {
+        toast.info("Failed to log the failed delete action");
+      }
       toast.error("Failed to delete post");
     } finally {
       setDeletingId(null);
@@ -130,8 +195,8 @@ const AllPostsUser = () => {
           "border border-dashed rounded-2xl bg-muted/20",
         )}
       >
-        <div className="bg-[var(--accent-warm-muted)] p-4 rounded-full border border-border/60">
-          <FileText className="h-7 w-7 text-[color:var(--accent-warm)]" />
+        <div className="bg-(--accent-warm-muted) p-4 rounded-full border border-border/60">
+          <FileText className="h-7 w-7 text-(--accent-warm)" />
         </div>
         <div className="space-y-1">
           <h3 className="font-semibold text-lg tracking-tight font-display">
@@ -350,11 +415,11 @@ const AllPostsUser = () => {
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button
-                              variant="destructive"
-                              size="lg"
-                              className="flex-1 font-semibold h-12 shadow-sm rounded-full"
-                              disabled={deletingId === post._id}
-                            >
+                                  variant="destructive"
+                                  size="lg"
+                                  className="flex-1 font-semibold h-12 shadow-sm rounded-full"
+                                  disabled={deletingId === post._id}
+                                >
                                   {deletingId === post._id ? (
                                     <Loader2 className="h-5 w-5 animate-spin" />
                                   ) : (

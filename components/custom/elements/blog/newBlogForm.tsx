@@ -19,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { logAction } from "@/lib/db/functions/write";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,7 +33,7 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -60,6 +61,8 @@ type BlogForm = z.infer<typeof BlogFormObject>;
 
 const NewBlogForm = () => {
   const { user } = useUser();
+  const isMountedRef = useRef<boolean>(false)
+
   const userRecord = useQuery(api.functions.query.getUserStatus, {
     clerkUserId: user?.id ?? "skip",
   });
@@ -90,7 +93,7 @@ const NewBlogForm = () => {
       : "text-muted-foreground";
   const descriptionCountClass =
     descriptionValue.length > 350 ||
-    (descriptionValue.length < 50 && descriptionValue.length > 0)
+      (descriptionValue.length < 50 && descriptionValue.length > 0)
       ? "text-destructive"
       : "text-muted-foreground";
 
@@ -99,6 +102,23 @@ const NewBlogForm = () => {
       form.setValue("author", userRecord.data._id);
     }
   }, [userRecord, form]);
+
+  const [_id, setId] = useState<string>("");
+  const [fullName, setFullName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    if (isMountedRef.current && user) {
+      setId(user.id);
+      setFullName(user.fullName || "");
+      setEmail(user.emailAddresses[0].emailAddress);
+    }
+
+    return () => {
+      isMountedRef.current = false;
+    }
+  }, [user]);
 
   const handleSubmit = async (values: BlogForm) => {
     if (!userPosts?.canPost) {
@@ -114,8 +134,34 @@ const NewBlogForm = () => {
         ...values,
         author: values.author as Id<"users">,
       });
+
+      const res = await logAction({
+        clerk_user_id: _id,
+        email,
+        name: fullName,
+        transaction_type: "create_blog_attempt",
+        affected_table: "blogs",
+        affected_user_id: result.id ? result.id.toString() : "unknown_id",
+      });
+
+      if (!res.status) {
+        console.error("Failed to log the blog creation attempt.");
+      }
+
       if (result.status) {
         toast.success("Blog post created successfully!");
+        const res = await logAction({
+          clerk_user_id: _id,
+          email,
+          name: fullName,
+          transaction_type: "create_blog_success",
+          affected_table: "blogs",
+          affected_user_id: result.id ? result.id.toString() : "unknown_id",
+        });
+
+        if (!res.status) {
+          console.error("Failed to log the blog creation attempt.");
+        }
         form.reset({
           ...form.getValues(),
           title: "",
@@ -124,6 +170,18 @@ const NewBlogForm = () => {
           hidden: false,
         });
       } else {
+        const res = await logAction({
+          clerk_user_id: _id,
+          email,
+          name: fullName,
+          transaction_type: "create_blog_failure",
+          affected_table: "blogs",
+          affected_user_id: result.id ? result.id.toString() : "unknown_id",
+        });
+
+        if (!res.status) {
+          console.error("Failed to log the blog creation attempt.");
+        }
         toast.error("There was an error creating the blog post.");
       }
     } catch (error) {

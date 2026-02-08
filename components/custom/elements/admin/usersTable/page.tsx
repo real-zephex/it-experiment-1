@@ -45,8 +45,13 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { logAction } from "@/lib/db/functions/write";
+import { useUser } from "@clerk/nextjs";
 
 const UserTable = () => {
+  const { user } = useUser();
+  const { id, fullName } = user!;
+  const email = user?.emailAddresses[0]?.emailAddress || "unknown_email";
   const users = useQuery(api.functions.query.getAllUsers);
   const updateStatus = useMutation(api.functions.mutations.updateUserStatus);
   const updateRole = useMutation(api.functions.mutations.updateUserRole);
@@ -204,6 +209,17 @@ const UserTable = () => {
                                 } else {
                                   toast.error(`Error: ${status.message}`);
                                 }
+                                const res = await logAction({
+                                  clerk_user_id: id,
+                                  email: email,
+                                  name: fullName!,
+                                  transaction_type: "update_user_role",
+                                  affected_table: "users",
+                                  affected_user_id: user._id,
+                                });
+                                if (!res.status) {
+                                  toast.info("User role updated, but failed to log the transaction.");
+                                }
                               }
                               }
                             >
@@ -221,7 +237,7 @@ const UserTable = () => {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-2 cursor-pointer"
-                              onClick={() =>
+                              onClick={async () => {
                                 updateStatus({
                                   id: user._id,
                                   status:
@@ -229,6 +245,18 @@ const UserTable = () => {
                                       ? "pending"
                                       : "active",
                                 })
+                                const res = await logAction({
+                                  clerk_user_id: id,
+                                  email: email,
+                                  name: fullName!,
+                                  transaction_type: "update_user_status",
+                                  affected_table: "users",
+                                  affected_user_id: user._id,
+                                });
+                                if (!res.status) {
+                                  toast.info("User status updated, but failed to log the transaction.");
+                                }
+                              }
                               }
                             >
                               {user.status === "active" ? (
